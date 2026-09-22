@@ -5,6 +5,8 @@
 #include "datatypes.h"
 #include "lobby.h"
 #include "networkmanager.h"
+#include "mediatester.h"
+
 #include <QDebug>
 #include <QLibraryInfo>
 #include <QPluginLoader>
@@ -15,7 +17,6 @@
 
 int main(int argc, char *argv[])
 {
-  QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
   if (qgetenv("QT_FONT_DPI").isEmpty()) {
       qputenv("QT_FONT_DPI", "96");
   }
@@ -47,14 +48,6 @@ int main(int argc, char *argv[])
   while (it.hasNext())
     fontDatabase.addApplicationFont(it.next());
 
-  QPluginLoader apngPlugin("qapng");
-  if (!apngPlugin.load())
-    qCritical() << "QApng plugin could not be loaded";
-
-  QPluginLoader webpPlugin("qwebp");
-  if (!webpPlugin.load())
-    qCritical() << "QWebp plugin could not be loaded";
-
   QString p_language =
       Options::getInstance().language();
   if (p_language == "  " || p_language == "")
@@ -69,6 +62,9 @@ int main(int argc, char *argv[])
   qDebug() << ":/resource/translations/ao_" + p_language;
   appTranslator.load("ao_" + p_language, ":/resource/translations/");
   main_app.installTranslator(&appTranslator);
+
+  MediaTester *l_media_tester = new MediaTester(&main_app);
+  QObject::connect(l_media_tester, SIGNAL(done()), l_media_tester, SLOT(deleteLater()));
 
   main_app.construct_lobby();
   main_app.net_manager->get_server_list(std::bind(&Lobby::list_servers, main_app.w_lobby));

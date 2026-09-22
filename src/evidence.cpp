@@ -202,11 +202,11 @@ void Courtroom::refresh_evidence()
   QPoint p_point = ao_app->get_button_spacing("evidence_button_size",
                                               "courtroom_design.ini");
 
-  const int button_width = p_point.x();
+  const int button_width = qMax(16, p_point.x());
   int x_spacing = f_spacing.x();
   int x_mod_count = 0;
 
-  const int button_height = p_point.y();
+  const int button_height = qMax(16, p_point.y());
   int y_spacing = f_spacing.y();
   int y_mod_count = 0;
 
@@ -317,7 +317,7 @@ void Courtroom::set_evidence_page()
   ui_evidence_left->hide();
   ui_evidence_right->hide();
 
-  for (AOEvidenceButton *i_button : qAsConst(ui_evidence_list)) {
+  for (AOEvidenceButton *i_button : std::as_const(ui_evidence_list)) {
     i_button->hide();
   }
 
@@ -464,7 +464,7 @@ void Courtroom::on_evidence_clicked(int p_id)
   }
 
   ui_evidence_name->setText(local_evidence_list.at(f_real_id).name);
-  for (AOEvidenceButton *i_button : qAsConst(ui_evidence_list))
+  for (AOEvidenceButton *i_button : std::as_const(ui_evidence_list))
     i_button->set_selected(false);
 
   ui_evidence_list.at(p_id)->set_selected(true);
@@ -485,7 +485,7 @@ void Courtroom::on_evidence_double_clicked(int p_id)
     }
   }
 
-  for (AOEvidenceButton *i_button : qAsConst(ui_evidence_list))
+  for (AOEvidenceButton *i_button : std::as_const(ui_evidence_list))
     i_button->set_selected(false);
 
   // We have to check if the ID is on the currently displayed page.

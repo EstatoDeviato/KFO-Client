@@ -399,7 +399,7 @@ void Options::setColorLogEnabled(bool value)
 
 bool Options::clearSoundsDropdownOnPlayEnabled() const
 {
-  return config.value("stickysounds", true).toBool();
+  return config.value("stickysounds", false).toBool();
 }
 
 void Options::setClearSoundsDropdownOnPlayEnabled(bool value)
@@ -409,7 +409,7 @@ void Options::setClearSoundsDropdownOnPlayEnabled(bool value)
 
 bool Options::clearEffectsDropdownOnPlayEnabled() const
 {
-  return config.value("stickyeffects", true).toBool();
+  return config.value("stickyeffects", false).toBool();
 }
 
 void Options::setClearEffectsDropdownOnPlayEnabled(bool value)
@@ -419,7 +419,7 @@ void Options::setClearEffectsDropdownOnPlayEnabled(bool value)
 
 bool Options::clearPreOnPlayEnabled() const
 {
-  return config.value("stickypres", true).toBool();
+  return config.value("stickypres", false).toBool();
 }
 
 void Options::setClearPreOnPlayEnabled(bool value)
@@ -521,7 +521,7 @@ void Options::setAnimatedThemeEnabled(bool value)
 
 QString Options::defaultScalingMode() const
 {
-  return config.value("default_scaling", "fast").toString();
+  return config.value("default_scaling", "smooth").toString();
 }
 
 void Options::setDefaultScalingMode(QString value)
@@ -561,7 +561,7 @@ void Options::setPlaySelectedSFXOnIdle(bool value)
 
 bool Options::evidenceDoubleClickEdit() const
 {
-  return config.value("evidence_double_click", true).toBool();
+  return config.value("evidence_double_click", false).toBool();
 }
 
 void Options::setEvidenceDoubleClickEdit(bool value)
@@ -672,9 +672,19 @@ void Options::setMenuBarLocked(bool value)
   config.setValue("menu_bar_visible_btn", value);
 }
 
+bool Options::autoUpdates() const
+{
+  return config.value("autoupdates", true).toBool();
+}
+
+void Options::setAutoUpdates(bool value)
+{
+  config.setValue("autoupdates", value);
+}
+
 bool Options::crossfade() const
 {
-  return config.value("crossfade", true).toBool();
+  return config.value("crossfade", false).toBool();
 }
 
 void Options::setCrossfade(bool value)
@@ -786,7 +796,7 @@ QVector<server_type> Options::favorites()
   auto grouplist = favorite.childGroups();
   { // remove all negative and non-numbers
     auto filtered_grouplist = grouplist;
-    for (const QString &group : qAsConst(grouplist)) {
+    for (const QString &group : std::as_const(grouplist)) {
       bool ok = false;
       const int l_num = group.toInt(&ok);
       if (ok && l_num >= 0) {
@@ -801,7 +811,7 @@ QVector<server_type> Options::favorites()
     grouplist = std::move(filtered_grouplist);
   }
 
-  for (const QString &group : qAsConst(grouplist)) {
+  for (const QString &group : std::as_const(grouplist)) {
     server_type f_server;
     favorite.beginGroup(group);
     f_server.ip = favorite.value("address", "127.0.0.1").toString();
@@ -897,7 +907,7 @@ QString Options::getUIAsset(QString f_asset_name)
                     f_asset_name);
   }
 
-  for (const QString &l_path : qAsConst(l_paths)) {
+  for (const QString &l_path : std::as_const(l_paths)) {
     if (QFile::exists(l_path)) {
       return l_path;
     }

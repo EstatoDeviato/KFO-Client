@@ -50,6 +50,7 @@ void AOApplication::server_packet_received(AOPacket *p_packet)
     desk_mod_supported = false;
     evidence_supported = false;
     cccc_ic_supported = false;
+    video_supported = false;
     arup_supported = false;
     casing_alerts_supported = false;
     modcall_reason_supported = false;
@@ -98,6 +99,7 @@ void AOApplication::server_packet_received(AOPacket *p_packet)
     desk_mod_supported = false;
     evidence_supported = false;
     cccc_ic_supported = false;
+    video_supported = false;
     arup_supported = false;
     casing_alerts_supported = false;
     modcall_reason_supported = false;
@@ -144,6 +146,8 @@ void AOApplication::server_packet_received(AOPacket *p_packet)
       triplex_supported = true;
     if (f_packet.contains("typing_timer", Qt::CaseInsensitive))
       typing_timer_supported = true;
+    if (f_packet.contains("video_support", Qt::CaseInsensitive))
+      video_supported = true;
   log_to_demo = false;
   }
   else if (header == "PN") {
@@ -373,9 +377,7 @@ void AOApplication::server_packet_received(AOPacket *p_packet)
     if (f_contents_size > 3) {
         // Set overlay if not empty
         //   overlay
-        if (!f_contents[2].isEmpty()) {
-            w_courtroom->server_overlay = f_contents[2];
-        }
+        w_courtroom->server_overlay = f_contents[2];
     }
 
     const bool shouldShowImmediately =

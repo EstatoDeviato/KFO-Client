@@ -36,6 +36,13 @@ Lobby::Lobby(AOApplication *p_ao_app, NetworkManager *p_net_manager)
   ao_app = p_ao_app;
   net_manager = p_net_manager;
 
+  if (Options::getInstance().autoUpdates()) {
+    // Automatic updates are only supported on Windows, currently.
+#if defined(Q_OS_WIN)
+    ShellExecute(0, 0, TEXT("update.bat"), 0, 0, SW_SHOW);
+#endif
+  }
+
   loadUI();
   COMBO_RELOAD()
 }
@@ -486,7 +493,7 @@ void Lobby::list_servers()
   ui_serverlist_search->setText("");
 
   int i = 0;
-  for (const server_type &i_server : qAsConst(ao_app->get_server_list())) {
+  for (const server_type &i_server : std::as_const(ao_app->get_server_list())) {
     QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui_serverlist_tree);
     treeItem->setData(0, Qt::DisplayRole, i);
     treeItem->setText(1, i_server.name);

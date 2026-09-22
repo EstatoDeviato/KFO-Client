@@ -392,7 +392,7 @@ QString AOApplication::get_image_suffix(VPath path_to_check, bool static_image)
   if (!static_image) {
     suffixes.append({ ".webp", ".apng", ".gif" });
   }
-  suffixes.append(".png");
+  suffixes.append({ ".png", ".jpg", ".jpeg" });
 
   // Check if we were provided a direct filepath with a suffix already
   QString path = path_to_check.toQString();
@@ -703,6 +703,13 @@ QString AOApplication::get_sfx_looping(QString p_char, int p_emote)
     return f_result;
 }
 
+QString AOApplication::get_video_name(QString p_char, int p_emote)
+{
+  QString f_result =
+      read_char_ini(p_char, QString::number(p_emote + 1), "videos");
+  return f_result;
+}
+
 QString AOApplication::get_sfx_frame(QString p_char, QString p_emote,
                                      int n_frame)
 {
@@ -791,7 +798,7 @@ QStringList AOApplication::get_effects(QString p_char)
       return lhs.toInt() < rhs.toInt();
     });
 
-    for (const QString &i_group : qAsConst(l_group_list))
+    for (const QString &i_group : std::as_const(l_group_list))
     {
       const QString l_key = i_group + "/name";
       if (!l_effects_ini.contains(l_key))

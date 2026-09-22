@@ -92,7 +92,6 @@ QPixmap AOLayer::get_pixmap(QImage image)
       f_pixmap = f_pixmap.scaled(f_w, f_h);
     else
       f_pixmap = f_pixmap.scaledToHeight(f_h, transform_mode);
-    this->resize(f_pixmap.size());
   }
   return f_pixmap;
 }
@@ -155,14 +154,12 @@ void BackgroundLayer::load_image(QString p_filename)
 #ifdef DEBUG_MOVIE
   qDebug() << "[BackgroundLayer] BG loaded: " << p_filename;
 #endif
-  QString final_path = ao_app->get_image_suffix(ao_app->get_background_path(p_filename));
-
-  if (final_path == last_path) {
+  if (p_filename == last_path) {
     // Don't restart background if background is unchanged
     return;
   }
 
-  start_playback(final_path);
+  start_playback(p_filename);
   play();
 }
 
@@ -643,10 +640,10 @@ void AOLayer::shfx_timer_done()
 }
 
 void AOLayer::invert() {
-    const QPixmap* pixmap = this->pixmap();
-    QImage* image = new QImage(pixmap->toImage());
-    image->invertPixels(QImage::InvertRgb);
-    this->setPixmap(QPixmap::fromImage(*image));
+  const QPixmap pixmap = this->pixmap();
+  QImage *image = new QImage(pixmap.toImage());
+  image->invertPixels(QImage::InvertRgb);
+  this->setPixmap(QPixmap::fromImage(*image));
 }
 
 void AOLayer::onImageLoaded(const QImage& image) {
@@ -669,7 +666,7 @@ void AOLayer::onImageLoaded(const QImage& image) {
 
 void AOLayer::fade(bool in, int duration)
 {
-    QEasingCurve easing = in ? QEasingCurve::OutQuart : QEasingCurve::InQuart;
+    QEasingCurve easing = in ? QEasingCurve::OutQuad : QEasingCurve::InQuad;
   
     QGraphicsOpacityEffect* fade = new QGraphicsOpacityEffect(this);
     this->setGraphicsEffect(fade);
@@ -679,7 +676,12 @@ void AOLayer::fade(bool in, int duration)
     fade_anim->setEndValue(in ? 1 : 0);
     fade_anim->setEasingCurve(easing);
     fade_anim->start(QPropertyAnimation::DeleteWhenStopped);
-    connect(fade_anim, SIGNAL(finished()), this, SLOT(in?fadein_finished():fadeout_finished()));
+    if (in) {
+      connect(fade_anim, SIGNAL(finished()), this, SLOT(fadein_finished()));
+    }
+    else {
+      connect(fade_anim, SIGNAL(finished()), this, SLOT(fadeout_finished()));
+    }
 }
 
 void AOLayer::fadeout_finished() {}
